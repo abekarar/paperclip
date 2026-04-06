@@ -13,6 +13,7 @@ import {
   approvalService,
   heartbeatService,
   issueApprovalService,
+  issueService,
   logActivity,
   secretService,
 } from "../services/index.js";
@@ -31,6 +32,7 @@ export function approvalRoutes(db: Db) {
   const svc = approvalService(db);
   const heartbeat = heartbeatService(db);
   const issueApprovalsSvc = issueApprovalService(db);
+  const issuesSvc = issueService(db);
   const secretsSvc = secretService(db);
   const strictSecretsMode = process.env.PAPERCLIP_SECRETS_STRICT_MODE === "true";
 
@@ -92,6 +94,14 @@ export function approvalRoutes(db: Db) {
       });
     }
 
+    // Resolve the first linked issue's projectId so plugins can route this
+    // approval notification to the correct per-project context (e.g. Telegram
+    // forum topic). Approvals without linked issues (e.g. hire_agent) get null.
+    const firstIssueId = uniqueIssueIds[0] ?? null;
+    const firstIssueProjectId = firstIssueId
+      ? (await issuesSvc.getById(firstIssueId))?.projectId ?? null
+      : null;
+
     await logActivity(db, {
       companyId,
       actorType: actor.actorType,
@@ -100,6 +110,7 @@ export function approvalRoutes(db: Db) {
       action: "approval.created",
       entityType: "approval",
       entityId: approval.id,
+      projectId: firstIssueProjectId,
       details: { type: approval.type, issueIds: uniqueIssueIds },
     });
 

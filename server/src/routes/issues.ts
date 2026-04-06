@@ -1049,6 +1049,7 @@ export function issueRoutes(
       action: "issue.created",
       entityType: "issue",
       entityId: issue.id,
+      projectId: issue.projectId ?? null,
       details: { title: issue.title, identifier: issue.identifier },
     });
 
@@ -1210,6 +1211,7 @@ export function issueRoutes(
       action: "issue.updated",
       entityType: "issue",
       entityId: issue.id,
+      projectId: issue.projectId ?? null,
       details: {
         ...updateFields,
         identifier: issue.identifier,
@@ -1674,6 +1676,7 @@ export function issueRoutes(
         action: "issue.updated",
         entityType: "issue",
         entityId: currentIssue.id,
+        projectId: currentIssue.projectId ?? null,
         details: {
           status: "todo",
           reopened: true,

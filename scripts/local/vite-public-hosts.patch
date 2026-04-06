@@ -1,0 +1,17 @@
+diff --git a/server/src/app.ts b/server/src/app.ts
+index b9faee2f..0afde687 100644
+--- a/server/src/app.ts
++++ b/server/src/app.ts
+@@ -275,7 +275,11 @@ export async function createApp(
+           port: hmrPort,
+           clientPort: hmrPort,
+         },
+-        allowedHosts: privateHostnameGateEnabled ? Array.from(privateHostnameAllowSet) : undefined,
++        allowedHosts: privateHostnameGateEnabled
++          ? Array.from(privateHostnameAllowSet)
++          : opts.deploymentExposure === "public"
++            ? true
++            : undefined,
+       },
+     });
+ 
